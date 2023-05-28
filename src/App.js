@@ -6,6 +6,7 @@ import Rank from './components/Rank/Rank.jsx'
 import ParticlesBg from 'particles-bg';
 import React, { Component } from 'react';
 import Clarifai from 'clarifai'
+import FaceRecognition from  './components/FaceRecognition/FaceRecognition'
 
 window.process = {}
 
@@ -30,19 +31,23 @@ class App extends Component {
     super()
     this.state = {
       input: '',
+      imageUrl: '',
     }
   }
 
   onInputChange = (e) => {
-    console.log(e.target.value);
+    this.setState({input: e.target.value})
   }
 
   onButtonSubmit = () => {
-    console.log('click')
-    app.models.predict('face-detection', "https://samples.clarifai.com/face-det.jpg").then(
+    this.setState({imageUrl: this.state.input})
+    app.models.predict(
+      'face-detection', 
+      this.state.input)
+      .then(
       function(response) {
         // do something with response
-        console.log(response)
+        console.log(response.outputs[0].data.regions[0].region_info.bounding_box)
       },
       function(err) {
         // there was an error
@@ -61,7 +66,7 @@ class App extends Component {
          onInputChange={this.onInputChange}
          onButtonSubmit={this.onButtonSubmit}
         />
-        {/* <FaceRecognition /> */}
+        <FaceRecognition imageUrl={this.state.imageUrl}/>
       </div>
     )
   }
